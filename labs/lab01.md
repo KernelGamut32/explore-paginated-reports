@@ -60,6 +60,10 @@ Total Action Obligation = SUM('Tetra Tech - Search Results'[Action Obligation])
 - Create a new workspace (in Power BI Service) or select an existing workspace with access
 - Confirm in the Power BI Service that the semantic model is present
 
+### 1.4 Save the report
+
+- Save the report as an .rdl file
+
 ## Part 2 - Connect Report Builder to the Power BI semantic model
 
 ### 2.1 Create the shared Data Source
@@ -67,59 +71,32 @@ Total Action Obligation = SUM('Tetra Tech - Search Results'[Action Obligation])
 - Open Power BI Report Builder and choose Blank Report
 - In the Report Data pane, right‑click Data Sources and choose Add Power BI semantic model connection...; sign in if prompted
 - Select your workspace, select the dataset/semantic model you published, and click Select
+
+![Data Source](../images/lab01/define-data-source.png)
+
 - Optional: rename the data source
 
 ### 2.2 Create a summary Dataset (by NAICS)
 
-- In the Report Datapane, right‑click Datasets, and click Add Dataset
+- In the Report Data pane, right‑click Datasets, and click Add Dataset
 - Name the dataset something like ds_SummaryByNAICS
 - Choose your data source from the dropdown and click Query Designer
 - Drag the NAICS Description field and the Total Action Obligation measure into the dataset definition
 - Execute the query to verify results
+
+![Summary by NAICS - Dataset Definition](../images/lab01/summ-by-naics-ds-screen01.png)
+
 - Click OK
 - In the resulting Query, add ```ORDER BY 'Tetra Tech - Search Results'[NAICS Description]``` to the end of the query
-- Click Validate Query (to confirm no errors) and click OK
+- Click Validate Query (to confirm no errors)
 
-### 2.3 Create a parameterized detail Dataset
+![Summary by NAICS - ORDER BY](../images/lab01/summ-by-naics-ds-screen02.png)
 
-- In the Report Datapane, right‑click Datasets, and click Add Dataset
-- Name the dataset something like ds_Details
-- Choose your data source from the dropdown
-- Click Parameters and add the following:
-  - State
-  - NAICS
-- Click Query
-- For Query, use the following:
+- Click OK and OK
 
-```DAX
-EVALUATE
-VAR __Base =
-    SELECTCOLUMNS(
-        'Tetra Tech - Search Results',
-        "Contract ID", 'Tetra Tech - Search Results'[Contract ID],
-        "Date Signed", 'Tetra Tech - Search Results'[Date Signed],
-        "Legal Business Name", 'Tetra Tech - Search Results'[Legal Business Name],
-        "NAICS Description", 'Tetra Tech - Search Results'[NAICS Description],
-        "PSC Description", 'Tetra Tech - Search Results'[PSC Description],
-        "Entity State", 'Tetra Tech - Search Results'[Entity State],
-        "Action Obligation", 'Tetra Tech - Search Results'[Action Obligation]
-    )
-RETURN
-    FILTER(
-        __Base,
-        [Entity State] IN { @State } &&
-        [NAICS Description] IN { @NAICS }
-    )
-ORDER BY [Date Signed] DESC
-```
+### 2.3 Create lookup Datasets for parameter dropdowns
 
-- Navigate to Fields and verify all field names
-- Click Query and click Validate Query (to confirm no errors)
-- Click OK
-
-### 2.4 Create lookup Datasets for parameter dropdowns
-
-- In the Report Datapane, right‑click Datasets, and click Add Dataset
+- In the Report Data pane, right‑click Datasets, and click Add Dataset
 - Name the dataset something like ds_States
 - Choose your data source from the dropdown
 - For Query, use the following:
@@ -129,9 +106,15 @@ EVALUATE SUMMARIZECOLUMNS('Tetra Tech - Search Results'[Entity State]) ORDER BY 
 ```
 
 - Navigate to Fields and verify all field names
+
+![State Parameter Dataset - Fields](../images/lab01/state-param-dataset-fields.png)
+
 - Click Query and click Validate Query (to confirm no errors)
-- Click OK
-- In the Report Datapane, right‑click Datasets, and click Add Dataset
+
+![State Parameter Dataset - Verify](../images/lab01/state-param-dataset-verify.png)
+
+- Click OK and OK
+- In the Report Data pane, right‑click Datasets, and click Add Dataset
 - Name the dataset something like ds_NAICS
 - Choose your data source from the dropdown
 - For Query, use the following:
@@ -141,44 +124,96 @@ EVALUATE SUMMARIZECOLUMNS('Tetra Tech - Search Results'[NAICS Description]) ORDE
 ```
 
 - Navigate to Fields and verify all field names
+
+![NAICS Parameter Dataset - Fields](../images/lab01/naics-param-dataset-fields.png)
+
 - Click Query and click Validate Query (to confirm no errors)
+
+![NAICS Parameter Dataset - Verify](../images/lab01/naics-param-dataset-verify.png)
+
+- Click OK and OK
+
+### 2.4 Create parameters for State and NAICS
+
+- In the Report Data pane, right-click Parameters, and click Add Parameter...
+- On the General tab, for Name use State and for Prompt use Selected State(s)
+
+![State Parameter - General](../images/lab01/state-param-general.png)
+
+- On the Available Values tab, set the following:
+
+![State Parameter - Available Values](../images/lab01/state-param-avail-values.png)
+
+- Click OK
+- In the Report Data pane, right-click Parameters, and click Add Parameter...
+- On the General tab, for Name use NAICS and for Prompt use Selected NAICS
+- Check Allow blank value (""):
+
+![NAICS Parameter - General](../images/lab01/naics-param-general.png)
+
+- On the Available Values tab, set the following:
+
+![NAICS Parameter - Available Values](../images/lab01/naics-param-avail-values.png)
+
 - Click OK
 
-### 2.5 Add a second summary Dataset for a matrix
+### 2.5 Create a parameterized detail Dataset
 
-- In the Report Datapane, right‑click Datasets, and click Add Dataset
+- In the Report Data pane, right‑click Datasets, and click Add Dataset
+- Name the dataset something like ds_Details
+- Choose your data source from the dropdown
+- For Query, use the following:
+
+```DAX
+EVALUATE SUMMARIZECOLUMNS('Tetra Tech - Search Results'[Contract ID], 'Tetra Tech - Search Results'[Date Signed], 'Tetra Tech - Search Results'[Legal Business Name], 'Tetra Tech - Search Results'[NAICS Description], 'Tetra Tech - Search Results'[PSC Description], 'Tetra Tech - Search Results'[Entity State], 'Tetra Tech - Search Results'[Action Obligation])
+```
+
+- Navigate to Fields and verify all field names
+
+![Details Dataset - Fields](../images/lab01/details-dataset-fields.png)
+
+- Click Filters and specify the following filters:
+
+![Details Dataset - Filters](../images/lab01/details-dataset-filters.png)
+
+- Click Query
+- In the resulting Query, add ```ORDER BY 'Tetra Tech - Search Results'[Date Signed]``` to the end of the query
+- Click Validate Query (to confirm no errors)
+
+![Details Dataset - Verify](../images/lab01/details-dataset-verify.png)
+
+- Click OK and OK
+
+### 2.6 Add a second summary Dataset for a matrix
+
+- In the Report Data pane, right‑click Datasets, and click Add Dataset
 - Name the dataset something like ds_SummaryByNAICSYear
 - Choose your data source from the dropdown and click Query Designer
 - Drag the NAICS Description field, the Year field, and the Total Action Obligation measure into the dataset definition
 - Execute the query to verify results
+
+![Summary by NAICS & Year - Dataset Definition](../images/lab01/summ-by-naics-year-ds-screen01.png)
+
 - Click OK
 - In the resulting Query, add ```ORDER BY 'Tetra Tech - Search Results'[NAICS Description], 'Tetra Tech - Search Results'[Year]``` to the end of the query
-- Click Validate Query (to confirm no errors) and click OK
+- Click Validate Query (to confirm no errors)
 
-### 2.6 Set parameter dropdown values
+![Summary by NAICS & Year - ORDER BY](../images/lab01/summ-by-naics-year-ds-screen02.png)
 
-- In the Report Datapane, expand Parameters
-- Right-click State and choose Parameter Properties
-- Click Available Values
-- Select Get values from a query
-- Select ds_States from the Dataset dropdown
-- Select Entity_State from the Value field dropdown
-- Select Entity_State from the Label field dropdown
-- Click OK
-- Right-click NAICS and choose Parameter Properties
-- Click Available Values
-- Select Get values from a query
-- Select ds_NAICS from the Dataset dropdown
-- Select NAICS_Description from the Value field dropdown
-- Select NAICS_Description from the Label field dropdown
-- Click OK
+- Click OK and OK
 
-## Part 3 - Layout smoke test (minimal formatting)
+### 2.7 Save the report
+
+- Save the report as an .rdl file
+
+## Part 3 - Create the report layout
 
 ### 3.1 Add a title placeholder in the header
 
 - Use Insert → Header → Add Header to add a new header
 - Move the existing title textbox into the header and apply a meaningful value (e.g., FPDS - Tetra Tech)
+
+![Add Header](../images/lab01/report-header.png)
 
 ### 3.2 Add a table for detail display
 
@@ -192,6 +227,9 @@ EVALUATE SUMMARIZECOLUMNS('Tetra Tech - Search Results'[NAICS Description]) ORDE
   - NAICS_Description
   - PSC_Description
   - Action_Obligation
+
+![Initial Table Definition](../images/lab01/initial-table-definition.png)
+
 - Click Next
 - Click Next
 - Click Finish
@@ -200,6 +238,8 @@ EVALUATE SUMMARIZECOLUMNS('Tetra Tech - Search Results'[NAICS Description]) ORDE
 - Add page numbers to the footer
 - Click run, select a value for state, and select a value for NAICS
 - Click View Report
+
+![Initial Report View](../images/lab01/initial-report-view.png)
 
 ### 3.3 Adjust formatting and display
 
@@ -213,7 +253,7 @@ EVALUATE SUMMARIZECOLUMNS('Tetra Tech - Search Results'[NAICS Description]) ORDE
 - Adjust the formatting expression for [Date_Signed] and use `=Format(Fields!Date_Signed.Value, "yyyy-MM-dd")` instead
 - Rerun the report
 - Click Design
-- Click [Sum(Action_Obligation)]
+- Click [Action_Obligation]
 - On the Home menu, in the Number section, select Currency from the dropdown
 - Under Font, click Color, and click Expression
 - Use `=IIF(Fields!Action_Obligation.Value < 0, "Red", "Black")` for the expression
@@ -221,3 +261,35 @@ EVALUATE SUMMARIZECOLUMNS('Tetra Tech - Search Results'[NAICS Description]) ORDE
 
 ### 3.4 Add multi-select to parameters
 
+- Click Design to return to report design mode
+- In the Report Data pane under Parameters, right-click the State parameter and click Parameter Properties
+- On the General tab, check Allow multiple values:
+
+![State Parameter Multi-select - General](../images/lab01/state-param-multi-general.png)
+
+- On the default values tab, set the following properties:
+
+![State Parameter Multi-select - Defaults](../images/lab01/state-param-default-values.png)
+
+- Click OK
+- In the Report Data pane under Parameters, right-click the NAICS parameter and click Parameter Properties
+- On the General tab, check Allow multiple values:
+
+![NAICS Parameter Multi-select - General](../images/lab01/naics-param-multi-general.png)
+
+- On the default values tab, set the following properties:
+
+![NAICS Parameter Multi-select - Defaults](../images/lab01/naics-param-default-values.png)
+
+- Click OK
+- In the Report Data pane under Datasets, right-click the ds_Details dataset and Dataset Properties
+- Click Filters and change the Operator in each filter from = to In
+
+![Details Dataset - Updated Filters](../images/lab01/details-dataset-filter-updates.png)
+
+- Click OK
+- Rerun the report
+
+### 3.X Save the report
+
+- Save the report as an .rdl file
