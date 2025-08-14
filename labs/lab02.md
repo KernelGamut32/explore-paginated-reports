@@ -1,8 +1,8 @@
-# Lab 02 - Data Sources & Datasets
+# Lab 02
 
 ## Overview
 
-In this lab, you’ll use Power BI Report Builder to connect to a Power BI semantic model (dataset) that’s built from a CSV exported from FPDS. You’ll create a shared data source, build multiple datasets (including parameterized and lookup datasets), then do a quick layout smoke test by adding a table and a matrix with no formatting.
+In this lab, you’ll use Power BI Report Builder to connect to a Power BI semantic model (dataset) that’s built from a CSV exported from FPDS. You’ll create a shared data source, build multiple datasets (including parameterized and lookup datasets). You'll then explore report design, layout, formatting, and report interactivity (filtering, grouping).
 
 ## Learning objectives
 
@@ -12,7 +12,9 @@ By the end, you can:
 - Connect a paginated report to a Power BI dataset.
 - Build summary and detail datasets, plus lookup datasets for parameters.
 - Add parameters and wire them to datasets.
-- Validate the datasets end‑to‑end with a simple table and matrix.
+- Create tables with formatting and interactivity.
+- Leverage grouping, filtering, and interactive expand/collapse in a report.
+- Explore interactive vs. export/print modes.
 
 ## What you need
 
@@ -59,10 +61,6 @@ Total Action Obligation = SUM('Tetra Tech - Search Results'[Action Obligation])
 - Home → Publish → login to the Power BI Service (if required)
 - Create a new workspace (in Power BI Service) or select an existing workspace with access
 - Confirm in the Power BI Service that the semantic model is present
-
-### 1.4 Save the report
-
-- Save the report as an .rdl file
 
 ## Part 2 - Connect Report Builder to the Power BI semantic model
 
@@ -517,3 +515,7 @@ EVALUATE SUMMARIZECOLUMNS('Tetra Tech - Search Results'[NAICS Description]) ORDE
 ### 5.4 Save the report
 
 - Save the report as an .rdl file
+
+## Part 6 - Matrices and lists
+
+Experiment with matrix creation (using the two summary datasets generated as part of this lab) and with lists to explore the mechanics, usage, and consider use cases where they could be applicable for your own workloads.
